@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Price Predictor</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    
+    <video autoplay muted loop id="background-video">
+        <source src="{{ url_for('static', filename='stock_background.mp4') }}" type="video/mp4">
+        Your browser does not support the video tag.
+    </video>
+    
+    <div class="container">
+        <div class="header">
+            <h1>Stock Price Predictor 📈</h1>
+            <p>Enter a ticker to predict the next two closing days.</p>
+        </div>
+        
+        <form id="prediction-form" action="/predict" method="post">
+            <input type="text" name="ticker" placeholder="e.g., AAPL, GOOG, MSFT" required>
+            <button type="submit">Predict</button>
+        </form>
+
+        <div class="spinner-container hidden" id="spinner">
+            <div class="spinner"></div>
+            <p>Fetching data and making prediction...</p>
+        </div>
+
+        {% if results %}
+        <div class="result-card">
+            <h2>Prediction for: {{ results.ticker }}</h2>
+            <p><strong>Tomorrow:</strong> ₹{{ "%.2f"|format(results.tomorrow_price_inr) }} (${{ "%.2f"|format(results.tomorrow_price_usd) }})</p>
+            <p><strong>Day After Tomorrow:</strong> ₹{{ "%.2f"|format(results.day_after_price_inr) }} (${{ "%.2f"|format(results.day_after_price_usd) }})</p>
+            <hr>
+            <p class="rate">Conversion Rate: 1 USD = ₹{{ "%.2f"|format(results.usd_to_inr_rate) }}</p>
+        </div>
+        {% endif %}
+
+        {% if error %}
+        <div class="error-card">
+            <p>{{ error }}</p>
+        </div>
+        {% endif %}
+    </div>
+
+    <script>
+        const form = document.getElementById('prediction-form');
+        const spinner = document.getElementById('spinner');
+
+        form.addEventListener('submit', () => {
+            spinner.classList.remove('hidden');
+        });
+    </script>
+</body>
+</html>
